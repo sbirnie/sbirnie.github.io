@@ -3,16 +3,16 @@
         <script src=https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js></script>
         <link rel="stylesheet" href=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css>
         <script src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js></script>
-        <script src="./allPlanes.js"></script>
+        <script src="allPlanes.js"></script>
     </head>
     <body >
-        <div id="frame"">
+        <div id="frame" style="text-align : center;">
         <div id="gameSetup" class="game-setup">
             <button id="selectAll" class="ui-button ui-widget ui-corner-all">Select All</button>
             <button id="clearAll" class="ui-button ui-widget ui-corner-all">Clear All</button>
             <div id="accordion">
                 
-            </div>
+              </div>
         </div>
    
         <p></p>
@@ -58,7 +58,7 @@
             function setupGameOptions() {
                 $('#selectAll').hide();
                 $('#clearAll').hide();
-
+                
                 /*
                 var currentSet = "";
                 allPlanes.data.forEach(plane => {
