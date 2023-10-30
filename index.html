@@ -1,0 +1,147 @@
+<html>
+    <head>
+        <script src=https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js></script>
+        <link rel="stylesheet" href=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css>
+        <script src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js></script>
+        <script src="allPlanes.js"></script>
+    </head>
+    <body >
+        <div id="frame" style="text-align : center;">
+        <div id="gameSetup" class="game-setup">
+            <button id="selectAll" class="ui-button ui-widget ui-corner-all">Select All</button>
+            <button id="selectAll" class="ui-button ui-widget ui-corner-all">Clear All</button>
+            <div id="accordion">
+                
+              </div>
+        </div>
+   
+        <p></p>
+ 
+        <div id="playGame" class="game-play">
+            <div id="viewPlane">
+                <img id="planeImage" height="932", width="762">
+            </div>
+        </div>
+ 
+        <button id="gameBtn" class="ui-button ui-widget ui-corner-all">Play</button>
+        <button id="prevBtn" class="ui-button ui-widget ui-corner-all game-play">Prev</button>
+        <button id="nextBtn" class="ui-button ui-widget ui-corner-all game-play">Next</button>
+        <button id="moveToEndBtn" class="ui-button ui-widget ui-corner-all game-play">Move plane to end</button>
+ 
+    </div>
+
+        <script>
+            var currentPlane = 0;
+            var maxPlanes = 0;
+            var shuffledPlanes;
+ 
+            function knuthShuffle(arr) {
+                var rand, temp, i;
+ 
+                for (i = arr.length - 1; i > 0; i -= 1) {
+                    rand = Math.floor((i + 1) * Math.random());//get random between zero and i (inclusive)
+                    temp = arr[rand];
+                    arr[rand] = arr[i]; //swap i (last element) with random element.
+                    arr[i] = temp;
+                }
+                return arr;
+            }
+
+            function showPlane(arr, id) {
+                $('#planeImage').attr('src', arr[id].image_uris.large);
+                $('#planeImage').attr('alt', arr[id].name);
+                $('#planeImage').css({
+                    'transform': 'rotate(90deg)'
+                });
+            }
+ 
+            function setupGameOptions() {
+                var currentSet = "";
+                allPlanes.data.forEach(plane => {
+                    if (plane.set != currentSet) {
+                        currentSet = plane.set
+                        $("#accordion").append("<h3>" + plane.set_name + "</h3><div id='" + currentSet + "'></div>");
+                    }
+                    $('#'+ currentSet).append(plane.name + "<br>");
+                });
+                $( "#accordion" ).accordion({
+                    collapsible: true
+                    });
+            }
+
+            $(document).ready(function(){
+                setupGameOptions();
+                
+                maxPlanes = allPlanes.total_cards
+                $('.game-setup').show()
+                $('.game-play').hide()
+   
+                $('#gameBtn').click(function() {
+                        if ($('#playGame').is(':hidden')) {
+                           
+                            // shuffle
+                            shuffledPlanes = knuthShuffle(allPlanes.data)
+ 
+                            // setup new game
+                            currentPlane = 0
+ 
+                            // show first plane
+                            showPlane(shuffledPlanes, currentPlane);
+ 
+                            // show game area and hide setup area
+                            $('.game-setup').hide()
+                            $('.game-play').show()
+                            $('#prevBtn').hide()
+                            $('#nextBtn').show()
+                            $('#gameBtn').text("End Game")
+                        } else {
+                            // End game.
+                            // show options for game
+                            currentPlane = 0;
+                            $('.game-setup').show()
+                            $('.game-play').hide()
+                            $('#gameBtn').text("Play")
+                        }
+                    }
+                )
+ 
+                $('#prevBtn').click(function() {
+                    if (currentPlane > 0) {
+                        currentPlane--;
+                        showPlane(shuffledPlanes, currentPlane);
+                    }
+ 
+                    $('#nextBtn').show()
+ 
+                    if (currentPlane == 0) {
+                        $('#prevBtn').hide()
+                    } else {
+                        $('#prevBtn').show()
+                    }
+                })
+           
+                $('#nextBtn').click(function() {
+                    if (currentPlane < maxPlanes - 1) {
+                        currentPlane++
+                        showPlane(shuffledPlanes, currentPlane);
+                    }
+ 
+                    $('#prevBtn').show()
+ 
+                    if (currentPlane == maxPlanes - 1) {
+                        $('#nextBtn').hide()
+                    } else {
+                        $('#nextBtn').show()
+                    }
+                })
+ 
+                $('#moveToEndBtn').click(function() {
+                       shuffledPlanes.push(shuffledPlanes.splice(currentPlane, 1)[0]);
+                       showPlane(shuffledPlanes, currentPlane);
+                    }
+                )
+ 
+            });
+        </script>
+    </body>
+</html>
