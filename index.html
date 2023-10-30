@@ -9,7 +9,7 @@
         <div id="frame"">
         <div id="gameSetup" class="game-setup">
             <button id="selectAll" class="ui-button ui-widget ui-corner-all">Select All</button>
-            <button id="selectAll" class="ui-button ui-widget ui-corner-all">Clear All</button>
+            <button id="clearAll" class="ui-button ui-widget ui-corner-all">Clear All</button>
             <div id="accordion">
                 
             </div>
@@ -56,6 +56,10 @@
             }
  
             function setupGameOptions() {
+                $('#selectAll').hide();
+                $('#clearAll').hide();
+
+                /*
                 var currentSet = "";
                 allPlanes.data.forEach(plane => {
                     if (plane.set != currentSet) {
@@ -66,11 +70,12 @@
                 });
                 $( "#accordion" ).accordion({
                     collapsible: true
-                    });
+                });
+                */
             }
 
             $(document).ready(function(){
-                // setupGameOptions();
+                setupGameOptions();
                 
                 maxPlanes = allPlanes.total_cards
                 $('.game-setup').show()
