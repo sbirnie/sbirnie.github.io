@@ -17,8 +17,8 @@ function knuthShuffle(arr) {
 function showPlane(arr, id) {
     $('#planeImage').attr('src', arr[id].image_uris.large);
     $('#planeImage').attr('alt', arr[id].name);
-    $('#planeImage').attr('height', "936px");
-    $('#planeImage').attr('width', "762px");
+    //$('#planeImage').attr('height', "936px");
+    //$('#planeImage').attr('width', "762px");
     $('#planeImage').css({
         'transform': 'rotate(90deg)'
     });
