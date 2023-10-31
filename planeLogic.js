@@ -17,6 +17,8 @@ function knuthShuffle(arr) {
 function showPlane(arr, id) {
     $('#planeImage').attr('src', arr[id].image_uris.large);
     $('#planeImage').attr('alt', arr[id].name);
+    //$('#planeImage').attr('height', "936px");
+    //$('#planeImage').attr('width', "762px");
     $('#planeImage').css({
         'transform': 'rotate(90deg)'
     });
@@ -28,7 +30,7 @@ function setupGameOptions() {
 
     currentSetName = "";
 
-    allPlanes.data.forEach(plane  => {
+    allPlanes.data.forEach(plane => {
         if (plane.set_name != currentSetName) {
             if (currentSetName != "") {
                 $('#accordion').append('</div>')
@@ -39,11 +41,11 @@ function setupGameOptions() {
         }
         $('#' + plane.set).append('<div class="form-check"><input class="plane-check form-check-input" type="checkbox" value="" data-name="' + plane.name + '" id="' + plane.id + '"><label class="form-check-label" for="' + plane.id + '">' + plane.name + '</label></div>')
     });
+
     $('#accordion').append('</div>')
 
     $('#accordion').accordion({
         collapsible: true,
-        active: false,
         heightStyle: "content"
     });
     $("#accordion .ui-accordion-content").show();
@@ -59,6 +61,7 @@ function getSelectedCheckboxes() {
             arrayOfCheckboxes.push($chxbx.prop('id'));
         }
     })
+
     return arrayOfCheckboxes;
 }
 
@@ -95,13 +98,27 @@ function initialSetup() {
                 return
             }
             // get/create array of selected planes.  right now we're just using all planes
-            selectedCheckboxes  = getSelectedCheckboxes();
             var selectedPlanes = allPlanes.data.filter(function (el) {
                 return selectedCheckboxes.includes(el.id)
             }
             )
 
-            //var selectedPlanes = allPlanes.data
+            if ($('#ignorePhenomenon').prop('checked') == true) {
+                index = selectedPlanes.length - 1;
+
+                while (index >= 0) {
+                    if (selectedPlanes[index].type_line === "Phenomenon") {
+                        selectedPlanes.splice(index, 1);
+                    }
+
+                    index -= 1;
+                }
+            }
+
+            if (selectedPlanes.length < 2) {
+                alert('Select at least 2 planes before starting.')
+                return
+            }
 
             // shuffle
             shuffledPlanes = knuthShuffle(selectedPlanes)
