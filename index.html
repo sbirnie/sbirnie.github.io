@@ -1,152 +1,56 @@
+<!doctype html>
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Planeswalking cards</title>
         <script src=https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link rel="stylesheet" href=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css>
         <script src=https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js></script>
-        <script src="allPlanes.js"></script>
+        <script src="./allPlanes.js"></script>
+        <script src="./planeLogic.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     </head>
-    <body >
-        <div id="frame" style="text-align : center;">
-        <div id="gameSetup" class="game-setup">
-            <button id="selectAll" class="ui-button ui-widget ui-corner-all">Select All</button>
-            <button id="clearAll" class="ui-button ui-widget ui-corner-all">Clear All</button>
-            <div id="accordion">
-                
-              </div>
-        </div>
-   
-        <p></p>
- 
-        <div id="playGame" class="game-play">
-            <div id="viewPlane">
-                <img id="planeImage" height="932", width="762">
+    <body>
+    <div class="container-fluid">
+        <div id="gameSetup" class="container game-setup">
+            <h2>Select planes to include</h2>
+            <button type="button" id="selectAll" class="btn btn-primary">Select All</button>
+            <button type="button" id="clearAll" class="btn btn-primary">Clear All</button>
+            <div class="row">
+                <div class="col">
+                    <div id="accordion">
+
+                    </div>
+                </div>
             </div>
         </div>
  
-        <button id="gameBtn" class="ui-button ui-widget ui-corner-all">Play</button>
-        <button id="prevBtn" class="ui-button ui-widget ui-corner-all game-play">Prev</button>
-        <button id="nextBtn" class="ui-button ui-widget ui-corner-all game-play">Next</button>
-        <button id="moveToEndBtn" class="ui-button ui-widget ui-corner-all game-play">Move plane to end</button>
+        <div id="playGame" class="container-fluid mt-5 game-play">
+            <div class="row">
+                <div class="col text-center">
+                    <img id="planeImage">
+                </div>
+            </div>
+        </div>
  
-    </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-4">
+                    <button type="button" id="gameBtn" class="btn btn-primary">Play</button>
+                    <button type="button" id="prevBtn" class="btn btn-primary game-play">Prev</button>
+                    <button type="button" id="nextBtn" class="btn btn-primary game-play">Next</button>
+                    <button type="button" id="moveToEndBtn" class="btn btn-primary game-play">Move plane to end</button>
+                </div>
+            </div>
+        </div>
 
         <script>
-            var currentPlane = 0;
-            var maxPlanes = 0;
-            var shuffledPlanes;
- 
-            function knuthShuffle(arr) {
-                var rand, temp, i;
- 
-                for (i = arr.length - 1; i > 0; i -= 1) {
-                    rand = Math.floor((i + 1) * Math.random());//get random between zero and i (inclusive)
-                    temp = arr[rand];
-                    arr[rand] = arr[i]; //swap i (last element) with random element.
-                    arr[i] = temp;
-                }
-                return arr;
-            }
-
-            function showPlane(arr, id) {
-                $('#planeImage').attr('src', arr[id].image_uris.large);
-                $('#planeImage').attr('alt', arr[id].name);
-                $('#planeImage').css({
-                    'transform': 'rotate(90deg)'
-                });
-            }
- 
-            function setupGameOptions() {
-                $('#selectAll').hide();
-                $('#clearAll').hide();
-                
-                /*
-                var currentSet = "";
-                allPlanes.data.forEach(plane => {
-                    if (plane.set != currentSet) {
-                        currentSet = plane.set
-                        $("#accordion").append("<h3>" + plane.set_name + "</h3><div id='" + currentSet + "'></div>");
-                    }
-                    $('#'+ currentSet).append(plane.name + "<br>");
-                });
-                $( "#accordion" ).accordion({
-                    collapsible: true
-                });
-                */
-            }
-
             $(document).ready(function(){
-                setupGameOptions();
-                
-                maxPlanes = allPlanes.total_cards
-                $('.game-setup').show()
-                $('.game-play').hide()
-   
-                $('#gameBtn').click(function() {
-                        if ($('#playGame').is(':hidden')) {
-                           
-                            // shuffle
-                            shuffledPlanes = knuthShuffle(allPlanes.data)
- 
-                            // setup new game
-                            currentPlane = 0
- 
-                            // show first plane
-                            showPlane(shuffledPlanes, currentPlane);
- 
-                            // show game area and hide setup area
-                            $('.game-setup').hide()
-                            $('.game-play').show()
-                            $('#prevBtn').hide()
-                            $('#nextBtn').show()
-                            $('#gameBtn').text("End Game")
-                        } else {
-                            // End game.
-                            // show options for game
-                            currentPlane = 0;
-                            $('.game-setup').show()
-                            $('.game-play').hide()
-                            $('#gameBtn').text("Play")
-                        }
-                    }
-                )
- 
-                $('#prevBtn').click(function() {
-                    if (currentPlane > 0) {
-                        currentPlane--;
-                        showPlane(shuffledPlanes, currentPlane);
-                    }
- 
-                    $('#nextBtn').show()
- 
-                    if (currentPlane == 0) {
-                        $('#prevBtn').hide()
-                    } else {
-                        $('#prevBtn').show()
-                    }
-                })
-           
-                $('#nextBtn').click(function() {
-                    if (currentPlane < maxPlanes - 1) {
-                        currentPlane++
-                        showPlane(shuffledPlanes, currentPlane);
-                    }
- 
-                    $('#prevBtn').show()
- 
-                    if (currentPlane == maxPlanes - 1) {
-                        $('#nextBtn').hide()
-                    } else {
-                        $('#nextBtn').show()
-                    }
-                })
- 
-                $('#moveToEndBtn').click(function() {
-                       shuffledPlanes.push(shuffledPlanes.splice(currentPlane, 1)[0]);
-                       showPlane(shuffledPlanes, currentPlane);
-                    }
-                )
- 
+                initialSetup();
             });
         </script>
+    </div>
     </body>
 </html>
