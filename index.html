@@ -28,20 +28,12 @@
 </head>
 
 <body>
-    <div id="planeInfoCard" class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                card'scontent.</p>
-        </div>
-    </div>
-
     <div class="container-fluid">
         <div id="gameSetup" class="container game-setup">
             <h2>Select planes to include</h2>
-            <button type="button" id="selectAll" class="btn btn-primary">Select All</button>
-            <button type="button" id="clearAll" class="btn btn-primary">Clear All</button>
+            <button type="button" id="selectAllBtn" class="btn btn-primary text-nowrap">Select All</button>
+            <button type="button" id="clearAllBtn" class="btn btn-primary text-nowrap">Clear All</button>
+            <button type="button" id="playBtn" class="btn btn-primary text-nowrap">Start Game</button>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="ignorePhenomenon">
                 <label class="form-check-label" for="ignorePhenomenon">
@@ -64,15 +56,15 @@
                     <img id="planeImage" class="img-fluid">
                 </div>
             </div>
-        </div>
-
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <button type="button" id="gameBtn" class="btn btn-primary">Play</button>
-                    <button type="button" id="prevBtn" class="btn btn-primary game-play">Prev</button>
-                    <button type="button" id="nextBtn" class="btn btn-primary game-play">Next</button>
-                    <button type="button" id="moveToEndBtn" class="btn btn-primary game-play">Move plane to end</button>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="button" id="endGameBtn" class="btn btn-primary text-nowrap game-play">End Game</button>
+                        <button type="button" id="prevBtn" class="btn btn-primary text-nowrap game-play">Prev</button>
+                        <button type="button" id="nextBtn" class="btn btn-primary text-nowrap game-play">Next</button>
+                        <button type="button" id="moveToEndBtn" class="btn btn-primary text-nowrap game-play">Move plane to
+                            end</button>
+                    </div>
                 </div>
             </div>
         </div>

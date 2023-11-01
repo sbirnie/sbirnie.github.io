@@ -4,6 +4,7 @@ var shuffledPlanes;
 
 // Constants
 var PHENOMENON_CLASS = "phenom-plane";
+var PLANE_LABEL_CLASS = "plane-label";
 
 function knuthShuffle(arr) {
     var rand, temp, i;
@@ -53,10 +54,12 @@ function setupGameOptions() {
     $('#accordion').append('</div>')
     $('#accordion').accordion({
         collapsible: true,
-        heightStyle: "content"
+        heightStyle: "content",
+        active: false
     });
+    $("#accordion").accordion("option", "active", false);
 
-    // create the handler for the All checkboxes for each group
+    // setup a change handler for the All checkboxes for each group
     $(".allCheck").change(function () {
         var checkSet = this.id.slice(0, -8);
         if (this.checked) {
@@ -75,31 +78,21 @@ function setupGameOptions() {
         items: '.plane-label',
         track: true,
         content: function () {
-            var element = $( this );
+            var element = $(this);
             var plane = allPlanes.data.find(x => x.id === element.attr('for'));
             if (plane) {
-                return "<div class='card bg-light ' >" + 
-                //"<img src='" + plane.image_uris.small + "'>" +
-                "<div class='card-header'>" + plane.name + "</div>" +
-                "<div class='card-body'>" +
+                return "<div class='card bg-light ' >" +
+                    //"<img class='card-img-top' src='" + plane.image_uris.normal + "' style='transform: rotate(90deg); width:50%; height:50%'>" +
+                    "<div class='card-header'>" + plane.name + "</div>" +
+                    "<div class='card-body'>" +
                     "<h6 class='card-subtitle text-muted'>" + plane.type_line + "</h5>" +
                     "<p class='card-text'>" + plane.oracle_text + "</p>" +
-                "</div></div>";
+                    "</div></div>";
             } else {
                 return "plane not found";
             }
         }
     });
-
-    /*
-    $('#selectHeader').uitooltip({
-        track: true,
-        content: function () {
-            var element = $( this );
-            return "custom tooltip";
-        }
-    });
-    */
 
     $("#accordion .ui-accordion-content").show();
 
@@ -125,9 +118,8 @@ function initialSetup() {
     setupGameOptions()
     $('.game-setup').show()
     $('.game-play').hide()
-    $('#planeInfoCard').hide()
 
-    $('#selectAll').click(function () {
+    $('#selectAllBtn').click(function () {
         var planeCheckBoxes = $('.plane-check');
         planeCheckBoxes.each(function (idx, cb) {
             var $chxbx = $(cb);
@@ -140,7 +132,7 @@ function initialSetup() {
         $('.allCheck').prop('checked', true);
     })
 
-    $('#clearAll').click(function () {
+    $('#clearAllBtn').click(function () {
         var planeCheckBoxes = $('.plane-check');
         planeCheckBoxes.each(function (idx, cb) {
             var $chxbx = $(cb);
@@ -158,66 +150,48 @@ function initialSetup() {
         }
     })
 
-    $('#gameBtn').click(function () {
-        if ($('#playGame').is(':hidden')) {
-            // check if any were checked
-            var selectedCheckboxes = getSelectedCheckboxes();
-            if (selectedCheckboxes.length < 2) {
-                alert('Select at least 2 planes before starting.')
-                return
-            }
-            // get/create array of selected planes.
-            var selectedPlanes = allPlanes.data.filter(function (el) {
-                return selectedCheckboxes.includes(el.id)
-            })
-
-            //don't think this is needed anymore.  We're unchecking phenoms when the checkbox is selected
-            /*
-            if ($('#ignorePhenomenon').prop('checked') == true) {
-                index = selectedPlanes.length - 1;
-
-                while (index >= 0) {
-                    if (selectedPlanes[index].type_line === "Phenomenon") {
-                        selectedPlanes.splice(index, 1);
-                    }
-
-                    index -= 1;
-                }
-            }
-            */
-
-            if (selectedPlanes.length < 2) {
-                alert('Select at least 2 planes before starting.')
-                return
-            }
-
-            // shuffle
-            shuffledPlanes = knuthShuffle(selectedPlanes)
-            maxPlanes = selectedPlanes.length
-
-            // setup new game
-            currentPlane = 0
-
-            // show first plane
-            showPlane(shuffledPlanes, currentPlane)
-
-            // show game area and hide setup area
-            $('.game-setup').hide()
-            $('.game-play').show()
-            $('#prevBtn').hide()
-            $('#nextBtn').show()
-            $('#gameBtn').text("End Game")
-        } else {
-            // End game.
-            // show options for game
-            currentPlane = 0;
-            $('.game-setup').show()
-            $('.game-play').hide()
-            $('#selectAll').show()
-            $('#clearAll').show()
-            $('#gameBtn').text("Play")
+    $('#playBtn').click(function () {
+        // check if any were checked
+        var selectedCheckboxes = getSelectedCheckboxes();
+        if (selectedCheckboxes.length < 2) {
+            alert('Select at least 2 planes before starting.')
+            return
         }
+        // get/create array of selected planes.
+        var selectedPlanes = allPlanes.data.filter(function (el) {
+            return selectedCheckboxes.includes(el.id)
+        })
+
+        if (selectedPlanes.length < 2) {
+            alert('Select at least 2 planes before starting.')
+            return
+        }
+
+        // shuffle the planes
+        shuffledPlanes = knuthShuffle(selectedPlanes)
+        maxPlanes = selectedPlanes.length
+
+        // setup new game
+        currentPlane = 0
+
+        // show first plane
+        showPlane(shuffledPlanes, currentPlane)
+
+        // start with the Previous button disabled since we're on the first plane.
+        $('#prevBtn').prop("disabled",true);
+        
+        // show game area and hide setup area
+        $('.game-setup').hide()
+        $('.game-play').show()
     })
+
+    $('#endGameBtn').click(function () {
+        // hide game area and show setup area
+        $('.game-setup').show()
+        $('.game-play').hide()
+
+        currentPlane = 0;
+    });
 
     $('#prevBtn').click(function () {
         if (currentPlane > 0) {
@@ -228,10 +202,11 @@ function initialSetup() {
         $('#nextBtn').show()
 
         if (currentPlane == 0) {
-            $('#prevBtn').hide()
+            $('#prevBtn').prop("disabled",true);
         } else {
-            $('#prevBtn').show()
+            $('#prevBtn').prop("disabled",false);
         }
+        $('#nextBtn').prop("disabled",false);
     })
 
     $('#nextBtn').click(function () {
@@ -243,10 +218,11 @@ function initialSetup() {
         $('#prevBtn').show()
 
         if (currentPlane == maxPlanes - 1) {
-            $('#nextBtn').hide()
+            $('#nextBtn').prop("disabled",true);
         } else {
-            $('#nextBtn').show()
+            $('#nextBtn').prop("disabled",false);
         }
+        $('#prevBtn').prop("disabled",false);
     })
 
     $('#moveToEndBtn').click(function () {
