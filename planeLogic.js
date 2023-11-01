@@ -2,6 +2,9 @@ var currentPlane = 0;
 var maxPlanes = 0;
 var shuffledPlanes;
 
+// Constants
+var PHENOMENON_CLASS = "phenom-plane";
+
 function knuthShuffle(arr) {
     var rand, temp, i;
 
@@ -17,8 +20,6 @@ function knuthShuffle(arr) {
 function showPlane(arr, id) {
     $('#planeImage').attr('src', arr[id].image_uris.large);
     $('#planeImage').attr('alt', arr[id].name);
-    //$('#planeImage').attr('height', "936px");
-    //$('#planeImage').attr('width', "762px");
     $('#planeImage').css({
         'transform': 'rotate(90deg)'
     });
@@ -30,6 +31,7 @@ function setupGameOptions() {
 
     currentSetName = "";
 
+    // Create the list of checkboxes for the planes
     allPlanes.data.forEach(plane => {
         if (plane.set_name != currentSetName) {
             if (currentSetName != "") {
@@ -38,16 +40,67 @@ function setupGameOptions() {
 
             $('#accordion').append('<h3>' + plane.set_name + '</h3><div id="' + plane.set + '">')
             currentSetName = plane.set_name
+            // create the All checkbox within this specific group.
+            $('#' + plane.set).append('<div class="form-check"><input class="form-check-input allCheck" type="checkbox" value="" id="' + plane.set + 'AllCheck"><label class="form-check-label" for="' + plane.set + 'allCheck">All</label></div>')
         }
-        $('#' + plane.set).append('<div class="form-check"><input class="plane-check form-check-input" type="checkbox" value="" data-name="' + plane.name + '" id="' + plane.id + '"><label class="form-check-label" for="' + plane.id + '">' + plane.name + '</label></div>')
+
+        var isPhenom = ""
+        if (plane.type_line == "Phenomenon") {
+            isPhenom = PHENOMENON_CLASS;
+        }
+        $('#' + plane.set).append('<div class="form-check"><input class="' + isPhenom + ' plane-check form-check-input" type="checkbox" value="" data-name="' + plane.name + '" id="' + plane.id + '"><label class="plane-label form-check-label" for="' + plane.id + '">' + plane.name + '</label></div>')
     });
-
     $('#accordion').append('</div>')
-
     $('#accordion').accordion({
         collapsible: true,
         heightStyle: "content"
     });
+
+    // create the handler for the All checkboxes for each group
+    $(".allCheck").change(function () {
+        var checkSet = this.id.slice(0, -8);
+        if (this.checked) {
+            $('#' + checkSet + ' .plane-check').prop('checked', true);
+        } else {
+            $('#' + checkSet + ' .plane-check').prop('checked', false);
+        }
+        // uncheck phenoms
+        if ($('#ignorePhenomenon').prop('checked') == true) {
+            $('#' + checkSet + ' .' + PHENOMENON_CLASS).prop('checked', false)
+        }
+    });
+
+    // create the hover tooltip for all the plane texts (plane-label class)
+    $('#gameSetup').uitooltip({
+        items: '.plane-label',
+        track: true,
+        content: function () {
+            var element = $( this );
+            var plane = allPlanes.data.find(x => x.id === element.attr('for'));
+            if (plane) {
+                return "<div class='card bg-light ' >" + 
+                //"<img src='" + plane.image_uris.small + "'>" +
+                "<div class='card-header'>" + plane.name + "</div>" +
+                "<div class='card-body'>" +
+                    "<h6 class='card-subtitle text-muted'>" + plane.type_line + "</h5>" +
+                    "<p class='card-text'>" + plane.oracle_text + "</p>" +
+                "</div></div>";
+            } else {
+                return "plane not found";
+            }
+        }
+    });
+
+    /*
+    $('#selectHeader').uitooltip({
+        track: true,
+        content: function () {
+            var element = $( this );
+            return "custom tooltip";
+        }
+    });
+    */
+
     $("#accordion .ui-accordion-content").show();
 
 }
@@ -72,13 +125,19 @@ function initialSetup() {
     setupGameOptions()
     $('.game-setup').show()
     $('.game-play').hide()
+    $('#planeInfoCard').hide()
 
     $('#selectAll').click(function () {
         var planeCheckBoxes = $('.plane-check');
         planeCheckBoxes.each(function (idx, cb) {
             var $chxbx = $(cb);
-            $chxbx.prop('checked', true)
+            if ($chxbx.hasClass(PHENOMENON_CLASS) && $('#ignorePhenomenon').prop('checked') == true) {
+                $chxbx.prop('checked', false)
+            } else {
+                $chxbx.prop('checked', true)
+            }
         })
+        $('.allCheck').prop('checked', true);
     })
 
     $('#clearAll').click(function () {
@@ -87,6 +146,16 @@ function initialSetup() {
             var $chxbx = $(cb);
             $chxbx.prop('checked', false)
         })
+        $('.allCheck').prop('checked', false);
+    })
+
+    $('#ignorePhenomenon').change(function () {
+        if (this.checked) {
+            $('.' + PHENOMENON_CLASS).prop('checked', false);
+            $('.' + PHENOMENON_CLASS).prop('disabled', true);
+        } else {
+            $('.' + PHENOMENON_CLASS).prop('disabled', false);
+        }
     })
 
     $('#gameBtn').click(function () {
@@ -97,12 +166,13 @@ function initialSetup() {
                 alert('Select at least 2 planes before starting.')
                 return
             }
-            // get/create array of selected planes.  right now we're just using all planes
+            // get/create array of selected planes.
             var selectedPlanes = allPlanes.data.filter(function (el) {
                 return selectedCheckboxes.includes(el.id)
-            }
-            )
+            })
 
+            //don't think this is needed anymore.  We're unchecking phenoms when the checkbox is selected
+            /*
             if ($('#ignorePhenomenon').prop('checked') == true) {
                 index = selectedPlanes.length - 1;
 
@@ -114,6 +184,7 @@ function initialSetup() {
                     index -= 1;
                 }
             }
+            */
 
             if (selectedPlanes.length < 2) {
                 alert('Select at least 2 planes before starting.')
